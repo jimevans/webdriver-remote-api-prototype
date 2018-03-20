@@ -84,6 +84,9 @@ namespace OpenQA.Selenium.IE
         private const string ValidateCookieDocumentTypeCapability = "ie.validateCookieDocumentType";
         private const string FileUploadDialogTimeoutCapability = "ie.fileUploadDialogTimeout";
         private const string EnableFullPageScreenshotCapability = "ie.enableFullPageScreenshot";
+        private const string NativeEventsCapability = "nativeEvents";
+        private const string UnexpectedAlertBehavior = "unexpectedAlertBehaviour";
+
 
         private bool ignoreProtectedModeSettings;
         private bool ignoreZoomLevel;
@@ -107,6 +110,23 @@ namespace OpenQA.Selenium.IE
         {
             this.BrowserName = "internet explorer";
             this.PlatformName = "windows";
+            this.AddKnownCapabilityName(Capability, "current InterentExplorerOptions class instance");
+            this.AddKnownCapabilityName(IgnoreProtectedModeSettingsCapability, "IntroduceInstabilityByIgnoringProtectedModeSettings property");
+            this.AddKnownCapabilityName(IgnoreZoomSettingCapability, "IgnoreZoomLevel property");
+            this.AddKnownCapabilityName(NativeEventsCapability, "EnableNativeEvents property");
+            this.AddKnownCapabilityName(InitialBrowserUrlCapability, "InitialBrowserUrl property");
+            this.AddKnownCapabilityName(ElementScrollBehaviorCapability, "ElementScrollBehavior property");
+            this.AddKnownCapabilityName(UnexpectedAlertBehavior, "UnhandledPromptBehavior property");
+            this.AddKnownCapabilityName(EnablePersistentHoverCapability, "EnablePersistentHover property");
+            this.AddKnownCapabilityName(RequireWindowFocusCapability, "RequireWindowFocus property");
+            this.AddKnownCapabilityName(BrowserAttachTimeoutCapability, "BrowserAttachTimeout property");
+            this.AddKnownCapabilityName(ForceCreateProcessApiCapability, "ForceCreateProcessApi property");
+            this.AddKnownCapabilityName(ForceShellWindowsApiCapability, "ForceShellWindowsApi property");
+            this.AddKnownCapabilityName(BrowserCommandLineSwitchesCapability, "BrowserComaandLineArguments property");
+            this.AddKnownCapabilityName(UsePerProcessProxyCapability, "UsePerProcessProxy property");
+            this.AddKnownCapabilityName(EnsureCleanSessionCapability, "EnsureCleanSession property");
+            this.AddKnownCapabilityName(FileUploadDialogTimeoutCapability, "FileUploadDialogTimeout property");
+            this.AddKnownCapabilityName(EnableFullPageScreenshotCapability, "EnableFullPageScreenshot property");
         }
 
         /// <summary>
@@ -318,27 +338,10 @@ namespace OpenQA.Selenium.IE
         /// has already been added will overwrite the existing value with the new value in <paramref name="capabilityValue"/></remarks>
         public void AddAdditionalCapability(string capabilityName, object capabilityValue, bool isGlobalCapability)
         {
-            if (capabilityName == IgnoreProtectedModeSettingsCapability ||
-                capabilityName == IgnoreZoomSettingCapability ||
-                capabilityName == HasNativeEventsCapability ||
-                capabilityName == InitialBrowserUrlCapability ||
-                capabilityName == ElementScrollBehaviorCapability ||
-                capabilityName == CapabilityType.UnhandledPromptBehavior ||
-                capabilityName == EnablePersistentHoverCapability ||
-                capabilityName == RequireWindowFocusCapability ||
-                capabilityName == BrowserAttachTimeoutCapability ||
-                capabilityName == ForceCreateProcessApiCapability ||
-                capabilityName == ForceShellWindowsApiCapability ||
-                capabilityName == BrowserCommandLineSwitchesCapability ||
-                capabilityName == CapabilityType.Proxy ||
-                capabilityName == UsePerProcessProxyCapability ||
-                capabilityName == EnsureCleanSessionCapability ||
-                capabilityName == ValidateCookieDocumentTypeCapability ||
-                capabilityName == CapabilityType.PageLoadStrategy ||
-                capabilityName == FileUploadDialogTimeoutCapability ||
-                capabilityName == EnableFullPageScreenshotCapability)
+            if (this.IsKnownCapabilityName(capabilityName))
             {
-                string message = string.Format(CultureInfo.InvariantCulture, "There is already an option for the {0} capability. Please use that instead.", capabilityName);
+                string typeSafeOptionName = this.GetTypeSafeOptionName(capabilityName);
+                string message = string.Format(CultureInfo.InvariantCulture, "There is already an option for the {0} capability. Please use the {1} instead.", capabilityName, typeSafeOptionName);
                 throw new ArgumentException(message, "capabilityName");
             }
 

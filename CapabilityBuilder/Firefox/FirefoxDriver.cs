@@ -124,14 +124,14 @@ namespace OpenQA.Selenium.Firefox
             return new DriverServiceCommandExecutor(service, commandTimeout);
         }
 
-        private static RemoteSessionSettings ConvertOptionsToCapabilities(FirefoxOptions options)
+        private static RemoteSessionOptions ConvertOptionsToCapabilities(FirefoxOptions options)
         {
             if (options == null)
             {
                 throw new ArgumentNullException("options", "options must not be null");
             }
 
-            return new RemoteSessionSettings(options);
+            return new RemoteSessionOptions(options);
         }
     }
 }

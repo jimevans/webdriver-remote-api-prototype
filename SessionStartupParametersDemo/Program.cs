@@ -27,17 +27,6 @@ namespace SessionStartupParametersDemo
             Console.ReadLine();
         }
 
-        private static void CreateBrowserSpecificDriverWithExperimentalOptions()
-        {
-            Console.WriteLine("Creating IE driver with specific options and experimental, new capability");
-            InternetExplorerOptions options = new InternetExplorerOptions();
-            options.PageLoadStrategy = PageLoadStrategy.Eager;
-            options.EnsureCleanSession = true;
-            options.RequireWindowFocus = true;
-            options.AddAdditionalCapability("myNewBrowserSpecificCapability", "hello world");
-            IWebDriver driver = new InternetExplorerDriver(options);
-        }
-
         private static void CreateDefaultBrowserSpecificDriver()
         {
             Console.WriteLine("Creating default IE driver");
@@ -51,6 +40,17 @@ namespace SessionStartupParametersDemo
             options.PageLoadStrategy = PageLoadStrategy.Eager;
             options.EnsureCleanSession = true;
             options.RequireWindowFocus = true;
+            IWebDriver driver = new InternetExplorerDriver(options);
+        }
+
+        private static void CreateBrowserSpecificDriverWithExperimentalOptions()
+        {
+            Console.WriteLine("Creating IE driver with specific options and experimental, new capability");
+            InternetExplorerOptions options = new InternetExplorerOptions();
+            options.PageLoadStrategy = PageLoadStrategy.Eager;
+            options.EnsureCleanSession = true;
+            options.RequireWindowFocus = true;
+            options.AddAdditionalCapability("myNewBrowserSpecificCapability", "hello world");
             IWebDriver driver = new InternetExplorerDriver(options);
         }
 
@@ -76,10 +76,10 @@ namespace SessionStartupParametersDemo
             ChromeOptions chromeOptions = new ChromeOptions();
             chromeOptions.AddArgument("--ignore-browser-security");
 
-            RemoteSessionSettings settings = new RemoteSessionSettings();
-            settings.AddDriverOptions(ieOptions);
-            settings.AddDriverOptions(firefoxOptions);
-            settings.AddDriverOptions(chromeOptions);
+            RemoteSessionOptions settings = new RemoteSessionOptions();
+            settings.AddFirstMatchDriverOption(ieOptions);
+            settings.AddFirstMatchDriverOption(firefoxOptions);
+            settings.AddFirstMatchDriverOption(chromeOptions);
             IWebDriver driver = new RemoteWebDriver(new Uri("http://path.to.remote.server:4444/wd/hub"), settings);
         }
 
@@ -92,11 +92,11 @@ namespace SessionStartupParametersDemo
             FirefoxOptions firefoxOptions = new FirefoxOptions();
             firefoxOptions.BrowserVersion = "52";
             firefoxOptions.SetPreference("my.firefox.preference", 1);
-            RemoteSessionSettings settings = new RemoteSessionSettings(ieOptions);
+            RemoteSessionOptions settings = new RemoteSessionOptions(ieOptions);
 
             try
             {
-                settings.AddDriverOptions(firefoxOptions);
+                settings.AddFirstMatchDriverOption(firefoxOptions);
             }
             catch (ArgumentException e)
             {
@@ -128,10 +128,10 @@ namespace SessionStartupParametersDemo
             ChromeOptions chromeOptions = new ChromeOptions();
             chromeOptions.BinaryLocation = @"C:\path\to\custom\chrome.exe";
 
-            RemoteSessionSettings settings = new RemoteSessionSettings(requiredOptions);
-            settings.AddDriverOptions(chromeOptions);
-            settings.AddDriverOptions(firefoxOptions);
-            settings.AddDriverOptions(ieOptions);
+            RemoteSessionOptions settings = new RemoteSessionOptions(requiredOptions);
+            settings.AddFirstMatchDriverOption(chromeOptions);
+            settings.AddFirstMatchDriverOption(firefoxOptions);
+            settings.AddFirstMatchDriverOption(ieOptions);
             IWebDriver driver = new RemoteWebDriver(new Uri("http://path.to.remote.server:4444/wd/hub"), settings);
         }
 
@@ -154,8 +154,8 @@ namespace SessionStartupParametersDemo
             // including specific versions of OS.
             cloudSettings.VirtualMachineOperatingSystem = "Windows 7";
 
-            RemoteSessionSettings sessionSettings = new RemoteSessionSettings();
-            sessionSettings.AddDriverOptions(firefoxOptions);
+            RemoteSessionOptions sessionSettings = new RemoteSessionOptions();
+            sessionSettings.AddFirstMatchDriverOption(firefoxOptions);
 
             // This name is an example only. A reputable cloud provider would
             // name this setting something meaningful.

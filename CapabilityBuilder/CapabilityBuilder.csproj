@@ -83,7 +83,7 @@
     <Compile Include="LogLevel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Proxy.cs" />
-    <Compile Include="RemoteSessionSettings.cs" />
+    <Compile Include="RemoteSessionOptions.cs" />
     <Compile Include="RemoteSetting.cs" />
     <Compile Include="Remote\RemoteWebDriver.cs" />
     <Compile Include="Remote\Response.cs" />

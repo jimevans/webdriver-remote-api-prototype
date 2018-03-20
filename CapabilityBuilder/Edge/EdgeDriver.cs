@@ -107,14 +107,14 @@ namespace OpenQA.Selenium.Edge
         {
         }
 
-        private static RemoteSessionSettings ConvertOptionsToCapabilities(EdgeOptions options)
+        private static RemoteSessionOptions ConvertOptionsToCapabilities(EdgeOptions options)
         {
             if (options == null)
             {
                 throw new ArgumentNullException("options", "options must not be null");
             }
 
-            return new RemoteSessionSettings(options);
+            return new RemoteSessionOptions(options);
         }
     }
 }

@@ -56,7 +56,7 @@ namespace OpenQA.Selenium.Chrome
         /// Gets the name of the capability used to store Chrome options in
         /// a <see cref="DesiredCapabilities"/> object.
         /// </summary>
-        public static readonly string Capability = "chromeOptions";
+        public static readonly string Capability = "goog:chromeOptions";
 
         private const string ArgumentsChromeOption = "args";
         private const string BinaryChromeOption = "binary";
@@ -88,9 +88,23 @@ namespace OpenQA.Selenium.Chrome
         private ChromeMobileEmulationDeviceSettings mobileEmulationDeviceSettings;
         private ChromePerformanceLoggingPreferences perfLoggingPreferences;
 
-        public ChromeOptions()
+        public ChromeOptions() : base()
         {
             this.BrowserName = "chrome";
+            this.AddKnownCapabilityName(ChromeOptions.Capability, "current ChromeOptions class instance");
+            this.AddKnownCapabilityName(CapabilityType.LoggingPreferences, "SetLoggingPreference method");
+            this.AddKnownCapabilityName(ChromeOptions.ArgumentsChromeOption, "AddArguments method");
+            this.AddKnownCapabilityName(ChromeOptions.BinaryChromeOption, "BinaryLocation property");
+            this.AddKnownCapabilityName(ChromeOptions.ExtensionsChromeOption, "AddExtensions method");
+            this.AddKnownCapabilityName(ChromeOptions.LocalStateChromeOption, "AddLocalStatePreference method");
+            this.AddKnownCapabilityName(ChromeOptions.PreferencesChromeOption, "AddUserProfilePreference method");
+            this.AddKnownCapabilityName(ChromeOptions.DetachChromeOption, "LeaveBrowserRunning property");
+            this.AddKnownCapabilityName(ChromeOptions.DebuggerAddressChromeOption, "DebuggerAddress property");
+            this.AddKnownCapabilityName(ChromeOptions.ExcludeSwitchesChromeOption, "AddExcludedArgument property");
+            this.AddKnownCapabilityName(ChromeOptions.MinidumpPathChromeOption, "MinidumpPath property");
+            this.AddKnownCapabilityName(ChromeOptions.MobileEmulationChromeOption, "EnableMobileEmulation method");
+            this.AddKnownCapabilityName(ChromeOptions.PerformanceLoggingPreferencesChromeOption, "PerformanceLoggingPreferences property");
+            this.AddKnownCapabilityName(ChromeOptions.WindowTypesChromeOption, "AddWindowTypes method");
         }
 
         /// <summary>
@@ -304,7 +318,7 @@ namespace OpenQA.Selenium.Chrome
                 throw new ArgumentException("extension must not be null or empty", "extension");
             }
 
-            this.AddExtensions(extension);
+            this.AddEncodedExtensions(extension);
         }
 
         /// <summary>
@@ -496,26 +510,13 @@ namespace OpenQA.Selenium.Chrome
         /// existing value with the new value in <paramref name="capabilityValue"/></remarks>
         public void AddAdditionalCapability(string capabilityName, object capabilityValue, bool isGlobalCapability)
         {
-            if (capabilityName == ChromeOptions.Capability ||
-                capabilityName == CapabilityType.Proxy ||
-                capabilityName == CapabilityType.LoggingPreferences ||
-                capabilityName == ChromeOptions.ArgumentsChromeOption ||
-                capabilityName == ChromeOptions.BinaryChromeOption ||
-                capabilityName == ChromeOptions.ExtensionsChromeOption ||
-                capabilityName == ChromeOptions.LocalStateChromeOption ||
-                capabilityName == ChromeOptions.PreferencesChromeOption ||
-                capabilityName == ChromeOptions.DetachChromeOption ||
-                capabilityName == ChromeOptions.DebuggerAddressChromeOption ||
-                capabilityName == ChromeOptions.ExtensionsChromeOption ||
-                capabilityName == ChromeOptions.ExcludeSwitchesChromeOption ||
-                capabilityName == ChromeOptions.MinidumpPathChromeOption ||
-                capabilityName == ChromeOptions.MobileEmulationChromeOption ||
-                capabilityName == ChromeOptions.PerformanceLoggingPreferencesChromeOption ||
-                capabilityName == ChromeOptions.WindowTypesChromeOption)
+            if (this.IsKnownCapabilityName(capabilityName))
             {
-                string message = string.Format(CultureInfo.InvariantCulture, "There is already an option for the {0} capability. Please use that instead.", capabilityName);
+                string typeSafeOptionName = this.GetTypeSafeOptionName(capabilityName);
+                string message = string.Format(CultureInfo.InvariantCulture, "There is already an option for the {0} capability. Please use the {1} instead.", capabilityName, typeSafeOptionName);
                 throw new ArgumentException(message, "capabilityName");
             }
+
 
             if (string.IsNullOrEmpty(capabilityName))
             {

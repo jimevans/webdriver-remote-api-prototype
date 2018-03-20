@@ -142,14 +142,14 @@ namespace OpenQA.Selenium.Safari
         {
         }
 
-        private static RemoteSessionSettings ConvertOptionsToCapabilities(SafariOptions options)
+        private static RemoteSessionOptions ConvertOptionsToCapabilities(SafariOptions options)
         {
             if (options == null)
             {
                 throw new ArgumentNullException("options", "options must not be null");
             }
 
-            return new RemoteSessionSettings(options);
+            return new RemoteSessionOptions(options);
         }
     }
 }

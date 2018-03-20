@@ -73,6 +73,15 @@ namespace OpenQA.Selenium.Firefox
             : base()
         {
             this.BrowserName = "firefox";
+            this.AddKnownCapabilityName(FirefoxOptions.Capability, "current FirefoxOptions class instance");
+            this.AddKnownCapabilityName(FirefoxOptions.IsMarionetteCapability, "UseLegacyImplementation property");
+            this.AddKnownCapabilityName(FirefoxOptions.FirefoxProfileCapability, "Profile property");
+            this.AddKnownCapabilityName(FirefoxOptions.FirefoxBinaryCapability, "BrowserExecutableLocation property");
+            this.AddKnownCapabilityName(FirefoxOptions.FirefoxArgumentsCapability, "AddArguments method");
+            this.AddKnownCapabilityName(FirefoxOptions.FirefoxPrefsCapability, "SetPreference method");
+            this.AddKnownCapabilityName(FirefoxOptions.FirefoxLogCapability, "LogLevel property");
+            this.AddKnownCapabilityName(FirefoxOptions.FirefoxLegacyProfileCapability, "Profile property");
+            this.AddKnownCapabilityName(FirefoxOptions.FirefoxLegacyBinaryCapability, "BrowserExecutableLocation property");
         }
 
         /// <summary>
@@ -80,7 +89,7 @@ namespace OpenQA.Selenium.Firefox
         /// </summary>
         /// <param name="profile">The <see cref="FirefoxProfile"/> to use in the options.</param>
         /// <param name="binary">The <see cref="FirefoxBinary"/> to use in the options.</param>
-        internal FirefoxOptions(FirefoxProfile profile, FirefoxBinary binary)
+        internal FirefoxOptions(FirefoxProfile profile, FirefoxBinary binary) : this()
         {
             this.BrowserName = "firefox";
             if (profile != null)
@@ -165,14 +174,6 @@ namespace OpenQA.Selenium.Firefox
             if (argumentsToAdd == null)
             {
                 throw new ArgumentNullException("argumentsToAdd", "argumentsToAdd must not be null");
-            }
-
-            foreach (string argument in argumentsToAdd)
-            {
-                if (!argument.StartsWith("--", StringComparison.OrdinalIgnoreCase))
-                {
-                    throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "All arguments must start with two dashes ('--'); argument '{0}' does not.", argument), "argumentsToAdd");
-                }
             }
 
             this.firefoxArguments.AddRange(argumentsToAdd);
@@ -268,17 +269,10 @@ namespace OpenQA.Selenium.Firefox
         /// existing value with the new value in <paramref name="capabilityValue"/></remarks>
         public void AddAdditionalCapability(string capabilityName, object capabilityValue, bool isGlobalCapability)
         {
-            if (capabilityName == IsMarionetteCapability ||
-                capabilityName == FirefoxProfileCapability ||
-                capabilityName == FirefoxBinaryCapability ||
-                capabilityName == FirefoxLegacyProfileCapability ||
-                capabilityName == FirefoxLegacyBinaryCapability ||
-                capabilityName == FirefoxArgumentsCapability ||
-                capabilityName == FirefoxLogCapability ||
-                capabilityName == FirefoxPrefsCapability ||
-                capabilityName == Capability)
+            if (this.IsKnownCapabilityName(capabilityName))
             {
-                string message = string.Format(CultureInfo.InvariantCulture, "There is already an option for the {0} capability. Please use that instead.", capabilityName);
+                string typeSafeOptionName = this.GetTypeSafeOptionName(capabilityName);
+                string message = string.Format(CultureInfo.InvariantCulture, "There is already an option for the {0} capability. Please use the {1} instead.", capabilityName, typeSafeOptionName);
                 throw new ArgumentException(message, "capabilityName");
             }
 

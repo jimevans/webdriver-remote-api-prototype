@@ -144,14 +144,14 @@ namespace OpenQA.Selenium.IE
         {
         }
 
-        private static RemoteSessionSettings ConvertOptionsToCapabilities(InternetExplorerOptions options)
+        private static RemoteSessionOptions ConvertOptionsToCapabilities(InternetExplorerOptions options)
         {
             if (options == null)
             {
                 throw new ArgumentNullException("options", "options must not be null");
             }
 
-            return new RemoteSessionSettings(options);
+            return new RemoteSessionOptions(options);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace OpenQA.Selenium
 {
 
     /// <summary>
-    /// Specifies the behavior of handling unexpected alerts in the IE driver.
+    /// Specifies the behavior of handling unexpected alerts in the driver.
     /// </summary>
     public enum UnhandledPromptBehavior
     {
@@ -39,18 +39,28 @@ namespace OpenQA.Selenium
         Ignore,
 
         /// <summary>
-        /// Accept unexpected alerts.
+        /// Silently accept unexpected alerts.
         /// </summary>
         Accept,
 
         /// <summary>
-        /// Dismiss unexpected alerts.
+        /// Silently dismiss unexpected alerts.
         /// </summary>
-        Dismiss
+        Dismiss,
+
+        /// <summary>
+        /// Accept unexpected alerts and raise UnhandledAlertException.
+        /// </summary>
+        AcceptAndNotify,
+
+        /// <summary>
+        /// Dismiss unexpected alerts and raise UnhandledAlertException.
+        /// </summary>
+        DismissAndNotify
     }
 
     /// <summary>
-    /// Specifies the behavior of waiting for page loads in the IE driver.
+    /// Specifies the behavior of waiting for page loads in the driver.
     /// </summary>
     public enum PageLoadStrategy
     {
@@ -80,7 +90,6 @@ namespace OpenQA.Selenium
     /// </summary>
     public class DriverOptions
     {
-        private Dictionary<string, LogLevel> loggingPreferences = new Dictionary<string, LogLevel>();
         private string browserName;
         private string browserVersion;
         private string platformName;
@@ -89,47 +98,83 @@ namespace OpenQA.Selenium
         private UnhandledPromptBehavior unhandledPromptBehavior = UnhandledPromptBehavior.Default;
         private PageLoadStrategy pageLoadStrategy = PageLoadStrategy.Default;
         private Dictionary<string, object> additionalCapabilities = new Dictionary<string, object>();
+        private Dictionary<string, LogLevel> loggingPreferences = new Dictionary<string, LogLevel>();
+        private Dictionary<string, string> knownCapabilityNames = new Dictionary<string, string>();
 
+        public DriverOptions()
+        {
+            this.AddKnownCapabilityName(CapabilityType.BrowserName, "BrowserName property");
+            this.AddKnownCapabilityName(CapabilityType.BrowserVersion, "BrowserVersion property");
+            this.AddKnownCapabilityName(CapabilityType.PlatformName, "PlatformName property");
+            this.AddKnownCapabilityName(CapabilityType.Proxy, "Proxy property");
+            this.AddKnownCapabilityName(CapabilityType.UnhandledPromptBehavior, "UnhandledPromptBehavior property");
+            this.AddKnownCapabilityName(CapabilityType.PageLoadStrategy, "PageLoadStrategy property");
+        }
+
+        /// <summary>
+        /// Gets or sets the name of the browser.
+        /// </summary>
         public string BrowserName
         {
             get { return this.browserName; }
             protected set { this.browserName = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the version of the browser.
+        /// </summary>
         public string BrowserVersion
         {
             get { return this.browserVersion; }
             set { this.browserVersion = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the name of the platform on which the browser is running.
+        /// </summary>
         public string PlatformName
         {
             get { return this.platformName; }
             set { this.platformName = value; }
         }
 
-        public Proxy Proxy
-        {
-            get { return this.proxy; }
-            set { this.proxy = value; }
-        }
-
+        /// <summary>
+        /// Gets or sets a value indicating whether the browser should accept self-signed
+        /// SSL certificates.
+        /// </summary>
         public bool? AcceptInsecureCertificates
         {
             get { return this.acceptInsecureCertificates; }
             set { this.acceptInsecureCertificates = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the value for describing how unexpected alerts are to be handled in the browser.
+        /// Defaults to <see cref="UnhandledPromptBehavior.Default"/>.
+        /// </summary>
         public UnhandledPromptBehavior UnhandledPromptBehavior
         {
             get { return this.unhandledPromptBehavior; }
             set { this.unhandledPromptBehavior = value; }
         }
 
+        /// <summary>
+        /// Gets or sets the value for describing how the browser is to wait for pages to load in the browser.
+        /// Defaults to <see cref="PageLoadStrategy.Default"/>.
+        /// </summary>
         public PageLoadStrategy PageLoadStrategy
         {
             get { return this.pageLoadStrategy; }
             set { this.pageLoadStrategy = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="Proxy"/> to be used with this browser.
+        /// </summary>
+        public Proxy Proxy
+        {
+            get { return this.proxy; }
+            set { this.proxy = value; }
         }
 
         /// <summary>
@@ -202,21 +247,29 @@ namespace OpenQA.Selenium
                 capabilities.SetCapability(CapabilityType.PageLoadStrategy, pageLoadStrategySetting);
             }
 
-            if (this.unhandledPromptBehavior != UnhandledPromptBehavior.Default)
+            if (this.UnhandledPromptBehavior != UnhandledPromptBehavior.Default)
             {
-                string unexpectedAlertBehaviorSetting = "dismiss";
-                switch (this.unhandledPromptBehavior)
+                string unhandledPropmtBehaviorSetting = "ignore";
+                switch (this.UnhandledPromptBehavior)
                 {
-                    case UnhandledPromptBehavior.Ignore:
-                        unexpectedAlertBehaviorSetting = "ignore";
+                    case UnhandledPromptBehavior.Accept:
+                        unhandledPropmtBehaviorSetting = "accept";
                         break;
 
-                    case UnhandledPromptBehavior.Accept:
-                        unexpectedAlertBehaviorSetting = "accept";
+                    case UnhandledPromptBehavior.Dismiss:
+                        unhandledPropmtBehaviorSetting = "dismiss";
+                        break;
+
+                    case UnhandledPromptBehavior.AcceptAndNotify:
+                        unhandledPropmtBehaviorSetting = "accept and notify";
+                        break;
+
+                    case UnhandledPromptBehavior.DismissAndNotify:
+                        unhandledPropmtBehaviorSetting = "dismiss and notify";
                         break;
                 }
 
-                capabilities.SetCapability(CapabilityType.UnhandledPromptBehavior, unexpectedAlertBehaviorSetting);
+                capabilities.SetCapability(CapabilityType.UnhandledPromptBehavior, unhandledPropmtBehaviorSetting);
             }
 
             if (this.proxy != null)
@@ -270,7 +323,7 @@ namespace OpenQA.Selenium
                 return result;
             }
 
-            if (this.unhandledPromptBehavior != UnhandledPromptBehavior.Default && other.UnhandledPromptBehavior != UnhandledPromptBehavior)
+            if (this.unhandledPromptBehavior != UnhandledPromptBehavior.Default && other.UnhandledPromptBehavior != UnhandledPromptBehavior.Default)
             {
                 result.IsMergeConflict = true;
                 result.MergeConflictOptionName = "UnhandledPromptBehavior";
@@ -296,6 +349,43 @@ namespace OpenQA.Selenium
         public void SetLoggingPreference(string logType, LogLevel logLevel)
         {
             this.loggingPreferences[logType] = logLevel;
+        }
+
+
+        /// <summary>
+        /// Adds a known capability to the list of known capabilities and associates it
+        /// with the type-safe property name of the options class to be used instead.
+        /// </summary>
+        /// <param name="capabilityName">The name of the capability.</param>
+        /// <param name="typeSafeOptionName">The name of the option property or method to be used instead.</param>
+        protected void AddKnownCapabilityName(string capabilityName, string typeSafeOptionName)
+        {
+            this.knownCapabilityNames[capabilityName] = typeSafeOptionName;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the specified capability name is known.
+        /// </summary>
+        /// <param name="capabilityName">The capability name to check.</param>
+        /// <returns><see langword="true"/> if the capability name is known; otherwise, <see langword="false"/>.</returns>
+        protected bool IsKnownCapabilityName(string capabilityName)
+        {
+            return this.knownCapabilityNames.ContainsKey(capabilityName);
+        }
+
+        /// <summary>
+        /// Gets the name of the type-safe option to use in place of the specified capability name.
+        /// </summary>
+        /// <param name="capabilityName">The capability name to check.</param>
+        /// <returns>A string describing the property or method to use in place of attempting to set the capability name.</returns>
+        protected string GetTypeSafeOptionName(string capabilityName)
+        {
+            if (this.IsKnownCapabilityName(capabilityName))
+            {
+                return string.Empty;
+            }
+
+            return this.knownCapabilityNames[capabilityName];
         }
 
         /// <summary>

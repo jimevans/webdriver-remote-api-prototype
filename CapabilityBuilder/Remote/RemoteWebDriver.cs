@@ -71,9 +71,9 @@ namespace OpenQA.Selenium.Remote
         /// Initializes a new instance of the <see cref="RemoteWebDriver"/> class.
         /// This constructor defaults proxy to http://127.0.0.1:4444/wd/hub
         /// </summary>
-        /// <param name="remoteSettings">An <see cref="RemoteSessionSettings"/> object
+        /// <param name="remoteSettings">An <see cref="RemoteSessionOptions"/> object
         /// containing the desired capabilities of the browser.</param>
-        public RemoteWebDriver(RemoteSessionSettings remoteSettings)
+        public RemoteWebDriver(RemoteSessionOptions remoteSettings)
             : this(new Uri("http://127.0.0.1:4444/wd/hub"), remoteSettings)
         {
         }
@@ -84,9 +84,9 @@ namespace OpenQA.Selenium.Remote
         /// </summary>
         /// <param name="remoteAddress">URI containing the address of the WebDriver 
         /// remote server (e.g. http://127.0.0.1:4444/wd/hub ).</param>
-        /// <param name="remoteSettings">An <see cref="RemoteSessionSettings"/> object
+        /// <param name="remoteSettings">An <see cref="RemoteSessionOptions"/> object
         /// containing the desired capabilities of the browser.</param>
-        public RemoteWebDriver(Uri remoteAddress, RemoteSessionSettings remoteSettings)
+        public RemoteWebDriver(Uri remoteAddress, RemoteSessionOptions remoteSettings)
             : this(remoteAddress, remoteSettings, RemoteWebDriver.DefaultCommandTimeout)
         {
         }
@@ -115,10 +115,10 @@ namespace OpenQA.Selenium.Remote
         /// </summary>
         /// <param name="remoteAddress">URI containing the address of the WebDriver
         /// remote server (e.g. http://127.0.0.1:4444/wd/hub ).</param>
-        /// <param name="remoteSettings">An <see cref="RemoteSessionSettings"/> object
+        /// <param name="remoteSettings">An <see cref="RemoteSessionOptions"/> object
         /// containing the desired capabilities of the browser.</param>
         /// <param name="commandTimeout">The maximum amount of time to wait for each command.</param>
-        public RemoteWebDriver(Uri remoteAddress, RemoteSessionSettings remoteSettings, TimeSpan commandTimeout)
+        public RemoteWebDriver(Uri remoteAddress, RemoteSessionOptions remoteSettings, TimeSpan commandTimeout)
             : this(new HttpCommandExecutor(remoteAddress, commandTimeout), remoteSettings)
         {
         }
@@ -128,24 +128,24 @@ namespace OpenQA.Selenium.Remote
         /// </summary>
         /// <param name="commandExecutor">An <see cref="ICommandExecutor"/> object
         /// which executes commands for the driver.</param>
-        /// <param name="remoteSettings">An <see cref="RemoteSessionSettings"/> object
+        /// <param name="remoteSettings">An <see cref="RemoteSessionOptions"/> object
         /// containing the desired capabilities of the browser.</param>
-        public RemoteWebDriver(ICommandExecutor commandExecutor, RemoteSessionSettings remoteSettings)
+        public RemoteWebDriver(ICommandExecutor commandExecutor, RemoteSessionOptions remoteSettings)
         {
             this.executor = commandExecutor;
-            string serializedPayload = JsonConvert.SerializeObject(remoteSettings.ToPayload(), Formatting.Indented);
+            string serializedPayload = JsonConvert.SerializeObject(remoteSettings.ToDictionary(), Formatting.Indented);
             Console.WriteLine("The following payload would be sent across the wire in the new session command:\n{0}", serializedPayload);
         }
 
-        private static RemoteSessionSettings CreateRemoteSessionSettings(DriverOptions browserOptions)
+        private static RemoteSessionOptions CreateRemoteSessionSettings(DriverOptions browserOptions)
         {
             if (browserOptions == null)
             {
                 throw new ArgumentNullException("browserOptions", "Options cannot be null");
             }
 
-            RemoteSessionSettings remoteSettings = new RemoteSessionSettings();
-            remoteSettings.AddDriverOptions(browserOptions);
+            RemoteSessionOptions remoteSettings = new RemoteSessionOptions();
+            remoteSettings.AddFirstMatchDriverOption(browserOptions);
             return remoteSettings;
         }
     }

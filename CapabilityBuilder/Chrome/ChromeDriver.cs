@@ -142,14 +142,14 @@ namespace OpenQA.Selenium.Chrome
         {
         }
 
-        private static RemoteSessionSettings ConvertOptionsToCapabilities(ChromeOptions options)
+        private static RemoteSessionOptions ConvertOptionsToCapabilities(ChromeOptions options)
         {
             if (options == null)
             {
                 throw new ArgumentNullException("options", "options must not be null");
             }
 
-            return new RemoteSessionSettings(options);
+            return new RemoteSessionOptions(options);
         }
     }
 }

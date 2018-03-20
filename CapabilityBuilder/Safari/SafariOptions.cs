@@ -50,7 +50,7 @@ namespace OpenQA.Selenium.Safari
         /// <summary>
         /// Initializes a new instance of the <see cref="SafariOptions"/> class.
         /// </summary>
-        public SafariOptions()
+        public SafariOptions() : base()
         {
             this.BrowserName = "safari";
         }

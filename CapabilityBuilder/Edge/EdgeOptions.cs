@@ -47,7 +47,7 @@ namespace OpenQA.Selenium.Edge
     {
         private Dictionary<string, object> additionalCapabilities = new Dictionary<string, object>();
 
-        public EdgeOptions()
+        public EdgeOptions() : base()
         {
             this.BrowserName = "MicrosoftEdge";
         }
@@ -66,11 +66,13 @@ namespace OpenQA.Selenium.Edge
         /// has already been added will overwrite the existing value with the new value in <paramref name="capabilityValue"/></remarks>
         public override void AddAdditionalCapability(string capabilityName, object capabilityValue)
         {
-            if (capabilityName == CapabilityType.PageLoadStrategy)
+            if (this.IsKnownCapabilityName(capabilityName))
             {
-                string message = string.Format(CultureInfo.InvariantCulture, "There is already an option for the {0} capability. Please use that instead.", capabilityName);
+                string typeSafeOptionName = this.GetTypeSafeOptionName(capabilityName);
+                string message = string.Format(CultureInfo.InvariantCulture, "There is already an option for the {0} capability. Please use the {1} instead.", capabilityName, typeSafeOptionName);
                 throw new ArgumentException(message, "capabilityName");
             }
+
 
             if (string.IsNullOrEmpty(capabilityName))
             {
